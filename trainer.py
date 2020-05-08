@@ -23,6 +23,8 @@ from iterator import read_squad_examples, convert_examples_to_features
 from model import DomainQA
 from utils import eta, progress_bar
 
+from model import EWCoverQA
+
 
 def get_opt(param_optimizer, num_train_optimization_steps, args):
     """
@@ -82,7 +84,7 @@ class BaseTrainer(object):
                                     world_size=self.args.world_size, rank=self.args.rank)
 
         # Load baseline model
-        self.model = BertForQuestionAnswering.from_pretrained(self.args.bert_model)
+        self.model = EWCoverQA.from_pretrained(self.args.bert_model)
 
         if self.args.load_model is not None:
             print("Loading model from ", self.args.load_model)
@@ -223,7 +225,7 @@ class BaseTrainer(object):
         torch.save(model_to_save.state_dict(), save_file)
         model_to_save.config.to_json_file(save_file_config)
 
-    def train(self):
+    def train(self, consolidate=True, fisher_estimation_sample_size=1024):
         step = 1
         avg_loss = 0
         global_step = 1
@@ -260,6 +262,10 @@ class BaseTrainer(object):
                     loss = self.model(input_ids, seg_ids, input_mask, start_positions, end_positions)
                     loss = loss.mean()
                     loss = loss / self.args.gradient_accumulation_steps
+                    
+                    ewc_loss = self.model.ewc_loss(cuda=cuda)
+                    loss = loss + ewc_loss
+                    
                     loss.backward()
 
                     avg_loss = self.cal_running_avg_loss(loss.item() * self.args.gradient_accumulation_steps, avg_loss)
@@ -290,6 +296,19 @@ class BaseTrainer(object):
                 result_dict = self.evaluate_model(epoch)
                 for dev_file, f1 in result_dict.items():
                     print("GPU/CPU {} evaluated {}: {:.2f}".format(self.args.gpu, dev_file, f1), end="\n")
+        
+        if consolidate:
+            # estimate the fisher information of the parameters and consolidate
+            # them in the network.
+            print(
+                '=> Estimating diagonals of the fisher information matrix...',
+                flush=True, end='',
+            )
+            # ATTENTION!!! the data_loader should entire training set!!!!
+            self.model.consolidate(self.model.estimate_fisher(
+                data_loader, fisher_estimation_sample_size
+            ))
+            print('EWC Loaded!')
 
     def evaluate_model(self, epoch):
         # result directory
