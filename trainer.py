@@ -23,7 +23,7 @@ from iterator import read_squad_examples, convert_examples_to_features
 from model import DomainQA
 from utils import eta, progress_bar
 
-
+from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
 
 
@@ -266,18 +266,19 @@ class BaseTrainer(object):
 
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
                                    all_start_positions, all_end_positions, all_labels )
-        if args.distributed:
-            train_sampler = DistributedSampler(train_data)
-            data_loader = DataLoader(train_data, num_workers=args.workers, pin_memory=True,
-                                     sampler=train_sampler, batch_size=args.batch_size)
-        else:
-            weights = make_weights_for_balanced_classes(all_labels.detach().cpu().numpy().tolist(), self.args.num_classes)
-            weights = torch.DoubleTensor(weights)
-            train_sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))
-            data_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=None,
-                                                      sampler=train_sampler, num_workers=args.workers,
-                                                      worker_init_fn=self.set_random_seed(self.args.random_seed), pin_memory=True, drop_last=True)
-        return data_loader
+        
+            
+        
+        return DataLoader(dataset, batch_size=args.batch_size, shuffle=True, collate_fn=default_collate, 
+                          **({'num_workers': 2, 'pin_memory': True} if cuda else {}))
+        #else:
+        #    weights = make_weights_for_balanced_classes(all_labels.detach().cpu().numpy().tolist(), self.args.num_classes)
+        #    weights = torch.DoubleTensor(weights)
+        #    train_sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))
+        #    data_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=None,
+        #                                              sampler=train_sampler, num_workers=args.workers,
+        #                                              worker_init_fn=self.set_random_seed(self.args.random_seed), pin_memory=True, drop_last=True)
+
         
        
                                    
