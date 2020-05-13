@@ -237,6 +237,7 @@ class BaseTrainer(object):
 
     
     def get_train_data(self, features_lst, args):
+
         
         all_input_ids = []
         all_input_mask = []
@@ -265,9 +266,10 @@ class BaseTrainer(object):
         all_labels = torch.cat(all_labels, dim=0)
 
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
-                                   all_start_positions, all_end_positions, all_labels
-        
+                                   all_start_positions, all_end_positions, all_labels )
         return train_data
+        
+       
                                    
     def get_iter(self, features_lst, args):
         all_input_ids = []
