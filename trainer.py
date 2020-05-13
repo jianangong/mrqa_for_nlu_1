@@ -270,7 +270,7 @@ class BaseTrainer(object):
             
         
         return DataLoader(train_data, batch_size=args.batch_size, shuffle=True, collate_fn=default_collate, 
-                          **({'num_workers': 2, 'pin_memory': True} if cuda else {}))
+                          **({'num_workers': 2, 'pin_memory': True}))
         #else:
         #    weights = make_weights_for_balanced_classes(all_labels.detach().cpu().numpy().tolist(), self.args.num_classes)
         #    weights = torch.DoubleTensor(weights)
