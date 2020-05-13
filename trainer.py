@@ -23,6 +23,7 @@ from iterator import read_squad_examples, convert_examples_to_features
 from model import DomainQA
 from utils import eta, progress_bar
 
+from torch.autograd import Variable
 
 def get_opt(param_optimizer, num_train_optimization_steps, args):
     """
