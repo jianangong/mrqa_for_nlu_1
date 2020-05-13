@@ -370,7 +370,7 @@ class BaseTrainer(object):
                 flush=True, end='',
             )
             # ATTENTION!!! the data_loader should entire training set!!!!
-            self.model.consolidate(self.model.estimate_fisher(
+            self.consolidate(self.estimate_fisher(
                 TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_start_positions, all_end_positions, all_labels), 
                 fisher_estimation_sample_size
             ))
