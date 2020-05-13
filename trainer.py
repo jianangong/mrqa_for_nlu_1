@@ -72,9 +72,8 @@ class BaseTrainer(object):
         self.features_lst = self.get_features(self.args.train_folder, self.args.debug)
         
      
-    def estimate_fisher(self, dataset, sample_size, batch_size=32):
+    def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
-        data_loader = utils.get_data_loader(dataset, batch_size)
         loglikelihoods = []
         for x, y in data_loader:
             x = x.view(batch_size, -1)
@@ -236,7 +235,7 @@ class BaseTrainer(object):
         return features_lst
 
     
-    def get_train_data(self, features_lst, args):
+    def get_data_loader(self, features_lst, args):
 
         
         all_input_ids = []
@@ -267,7 +266,18 @@ class BaseTrainer(object):
 
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
                                    all_start_positions, all_end_positions, all_labels )
-        return train_data
+        if args.distributed:
+            train_sampler = DistributedSampler(train_data)
+            data_loader = DataLoader(train_data, num_workers=args.workers, pin_memory=True,
+                                     sampler=train_sampler, batch_size=args.batch_size)
+        else:
+            weights = make_weights_for_balanced_classes(all_labels.detach().cpu().numpy().tolist(), self.args.num_classes)
+            weights = torch.DoubleTensor(weights)
+            train_sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))
+            data_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=None,
+                                                      sampler=train_sampler, num_workers=args.workers,
+                                                      worker_init_fn=self.set_random_seed(self.args.random_seed), pin_memory=True, drop_last=True)
+        return data_loader
         
        
                                    
@@ -407,7 +417,7 @@ class BaseTrainer(object):
             )
             # ATTENTION!!! the data_loader should entire training set!!!!
             self.consolidate(self.estimate_fisher(
-                self.get_train_data(self.features_lst, self.args), fisher_estimation_sample_size
+                self.get_data_loader(self.features_lst, self.args), fisher_estimation_sample_size
             ))
             print('EWC Loaded!')
 
