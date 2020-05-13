@@ -362,18 +362,19 @@ class BaseTrainer(object):
                 for dev_file, f1 in result_dict.items():
                     print("GPU/CPU {} evaluated {}: {:.2f}".format(self.args.gpu, dev_file, f1), end="\n")
         
-        #if consolidate:
-        #    # estimate the fisher information of the parameters and consolidate
-        #    # them in the network.
-        #    print(
-        #        '=> Estimating diagonals of the fisher information matrix...',
-        #        flush=True, end='',
-        #    )
-        #    # ATTENTION!!! the data_loader should entire training set!!!!
-        #    self.model.consolidate(self.model.estimate_fisher(
-        #        data_loader, fisher_estimation_sample_size
-        #    ))
-        #    print('EWC Loaded!')
+        if consolidate:
+            # estimate the fisher information of the parameters and consolidate
+            # them in the network.
+            print(
+                '=> Estimating diagonals of the fisher information matrix...',
+                flush=True, end='',
+            )
+            # ATTENTION!!! the data_loader should entire training set!!!!
+            self.model.consolidate(self.model.estimate_fisher(
+                TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_start_positions, all_end_positions, all_labels), 
+                fisher_estimation_sample_size
+            ))
+            print('EWC Loaded!')
 
     def evaluate_model(self, epoch):
         # result directory
