@@ -9,6 +9,7 @@ from pytorch_pretrained_bert import BertForQuestionAnswering
 class EWCoverQA(BertForQuestionAnswering):
     
     def __init__(self, lamda=40):
+        super(EWCoverQA, self).__init__()
         self.lamda = lamda
         
         
