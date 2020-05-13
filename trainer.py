@@ -327,7 +327,7 @@ class BaseTrainer(object):
                     loss = loss.mean()
                     loss = loss / self.args.gradient_accumulation_steps
                     
-                    ewc_loss = self.ewc_loss(cuda=cuda)
+                    ewc_loss = self.ewc_loss(cuda=True)
                     loss = loss + ewc_loss
                     
                     loss.backward()
