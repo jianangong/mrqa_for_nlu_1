@@ -60,10 +60,9 @@ def make_weights_for_balanced_classes(classes, n_classes):
 
 
 class BaseTrainer(object):
-    def __init__(self, args, lamda=40):
+    def __init__(self, args):
         self.args = args
         self.set_random_seed(random_seed=args.random_seed)
-        self.lamda = lamda
 
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
@@ -122,7 +121,7 @@ class BaseTrainer(object):
                 # estimated cramer-rao lower bound variance, which is
                 # equivalent to the inverse of fisher information)
                 losses.append((fisher * (p-mean)**2).sum())
-            return (self.lamda/2)*sum(losses)
+            return 20*sum(losses)
         except AttributeError:
             # ewc loss is 0 if there's no consolidated parameters.
             return (
