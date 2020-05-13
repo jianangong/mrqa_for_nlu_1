@@ -235,6 +235,40 @@ class BaseTrainer(object):
 
         return features_lst
 
+    
+    def get_train_data(self, features_lst, args):
+        
+        all_input_ids = []
+        all_input_mask = []
+        all_segment_ids = []
+        all_start_positions = []
+        all_end_positions = []
+        all_labels = []
+
+        for i, train_features in enumerate(features_lst):
+            all_input_ids.append(torch.tensor([f.input_ids for f in train_features], dtype=torch.long))
+            all_input_mask.append(torch.tensor([f.input_mask for f in train_features], dtype=torch.long))
+            all_segment_ids.append(torch.tensor([f.segment_ids for f in train_features], dtype=torch.long))
+
+            start_positions = torch.tensor([f.start_position for f in train_features], dtype=torch.long)
+            end_positions = torch.tensor([f.end_position for f in train_features], dtype=torch.long)
+
+            all_start_positions.append(start_positions)
+            all_end_positions.append(end_positions)
+            all_labels.append(i * torch.ones_like(start_positions))
+
+        all_input_ids = torch.cat(all_input_ids, dim=0)
+        all_input_mask = torch.cat(all_input_mask, dim=0)
+        all_segment_ids = torch.cat(all_segment_ids, dim=0)
+        all_start_positions = torch.cat(all_start_positions, dim=0)
+        all_end_positions = torch.cat(all_end_positions, dim=0)
+        all_labels = torch.cat(all_labels, dim=0)
+
+        train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
+                                   all_start_positions, all_end_positions, all_labels
+        
+        return train_data
+                                   
     def get_iter(self, features_lst, args):
         all_input_ids = []
         all_input_mask = []
@@ -371,8 +405,7 @@ class BaseTrainer(object):
             )
             # ATTENTION!!! the data_loader should entire training set!!!!
             self.consolidate(self.estimate_fisher(
-                TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_start_positions, all_end_positions, all_labels), 
-                fisher_estimation_sample_size
+                self.get_train_data(self.features_lst, self.args), fisher_estimation_sample_size
             ))
             print('EWC Loaded!')
 
