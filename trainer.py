@@ -66,8 +66,8 @@ class BaseTrainer(object):
     def __init__(self, args):
         self.args = args
         self.set_random_seed(random_seed=args.random_seed)
-        #self.bert = BertModel.from_pretrained("bert-base-uncased")
-        self.bert = BertModel(BertConfig())
+        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        #self.bert = BertModel(BertConfig())
         
         self.qa_outputs = nn.Linear(self.args.hidden_size, 2)
         # init weight
