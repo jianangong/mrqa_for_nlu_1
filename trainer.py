@@ -79,12 +79,26 @@ class BaseTrainer(object):
         loglikelihoods = []
         for i, batch in enumerate(data_loader, start=1):
             input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
-        
+            seq_len = torch.sum(torch.sign(input_ids), 1)
+            max_len = torch.max(seq_len)
+
+            input_ids = input_ids[:, :max_len].clone()
+            input_mask = input_mask[:, :max_len].clone()
+            seg_ids = seg_ids[:, :max_len].clone()
+            start_positions = start_positions.clone()
+            end_positions = end_positions.clone()
+
+            if self.args.use_cuda:
+                input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
+                input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
+                seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
+                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+                
             outputs = self.bert(
                 input_ids,
                 attention_mask=input_mask,
                 token_type_ids=seg_ids,
-                position_ids=None,
                 head_mask=None,
                 inputs_embeds=None,
             )
