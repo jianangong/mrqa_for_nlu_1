@@ -75,10 +75,10 @@ class BaseTrainer(object):
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
         loglikelihoods = []
-        #for x in data_loader:
-        for i in range(self.num_layers - 1):
-            x = self.hidden_layers[i](x)
-            logits = self.hidden_layers[-1](x)
+        for x in data_loader:
+        #for i in range(self.args.num_layers - 1):
+            x = self.self.args.hidden_size[i](x)
+            logits = self.args.hidden_size[-1](x)
             log_prob = F.log_softmax(logits, dim=1)
         
             #x = x.view(batch_size, -1)
