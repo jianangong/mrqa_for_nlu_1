@@ -107,7 +107,7 @@ class BaseTrainer(object):
             
             model = self.bert.to('cuda')
             
-            logits = self.qa_outputs(torch.stack(outputs = model(
+            logits = self.qa_outputs(torch.stack(model(
                 input_ids,
                 attention_mask=input_mask,
                 token_type_ids=seg_ids
