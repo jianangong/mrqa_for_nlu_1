@@ -25,7 +25,7 @@ from utils import eta, progress_bar
 
 from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
-import random
+from pytorch_pretrained_bert import BertModel
 
 
 def get_opt(param_optimizer, num_train_optimization_steps, args):
