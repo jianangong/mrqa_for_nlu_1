@@ -102,9 +102,8 @@ class BaseTrainer(object):
                 token_type_ids=seg_ids
             )
             
-            sequence_output = outputs[0]
+            sequence_output = torch.stack(outputs[0])
             logits = self.qa_outputs(sequence_output)
-            logits = torch.stack(logits).to(device)
             log_prob = F.log_softmax(logits, dim=1)
         
             loglikelihoods.append(log_prob)
