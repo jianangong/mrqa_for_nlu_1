@@ -90,8 +90,7 @@ class BaseTrainer(object):
             input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
             seq_len = torch.sum(torch.sign(input_ids), 1)
             max_len = torch.max(seq_len)
-            
-            
+          
             
             if self.args.use_cuda:
                 input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
@@ -106,18 +105,16 @@ class BaseTrainer(object):
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
 
-            loss = self.model(input_ids, seg_ids, input_mask, start_positions, end_positions)
             
+            outputs = self.bert(
+                input_ids,
+                attention_mask=input_mask,
+                token_type_ids=seg_ids
+            )
             
-            #outputs = self.bert(
-            #    input_ids,
-            #    attention_mask=input_mask,
-            #    token_type_ids=seg_ids
-            #)
-            #
-            #sequence_output = torch.stack(outputs[0])
-            #logits = self.qa_outputs(sequence_output)
-            log_prob = F.log_softmax(loss, dim=0)
+            sequence_output = torch.stack(outputs[0])
+            logits = self.qa_outputs(sequence_output)
+            log_prob = F.log_softmax(, dim=0)
            
             loglikelihoods.append(log_prob)
                 
