@@ -106,8 +106,8 @@ class BaseTrainer(object):
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
 
-            outputs = self.model(input_ids)
-            start_logits, end_logits = outputs[1:3]
+            loss = self.model(input_ids, seg_ids, input_mask, start_positions, end_positions)
+            
             
             #outputs = self.bert(
             #    input_ids,
@@ -117,7 +117,7 @@ class BaseTrainer(object):
             #
             #sequence_output = torch.stack(outputs[0])
             #logits = self.qa_outputs(sequence_output)
-            log_prob = F.log_softmax(start_logits, dim=1)
+            log_prob = F.log_softmax(torch.stack(loss), dim=1)
            
             loglikelihoods.append(log_prob)
                 
