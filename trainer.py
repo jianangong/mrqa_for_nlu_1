@@ -235,7 +235,7 @@ class BaseTrainer(object):
         return features_lst
 
     
-    def get_data_loader(self, features_lst, args):
+    def get_data_probs(self, features_lst, args):
 
         
         all_input_ids = []
@@ -267,7 +267,9 @@ class BaseTrainer(object):
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
                                    all_start_positions, all_end_positions, all_labels )
         
-            
+        train_sampler = DistributedSampler(train_data)
+        
+        logits = train_sampler.forward(train_data)
         
         if args.distributed:
             train_sampler = DistributedSampler(train_data)
