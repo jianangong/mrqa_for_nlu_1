@@ -65,6 +65,7 @@ class BaseTrainer(object):
     def __init__(self, args):
         self.args = args
         self.set_random_seed(random_seed=args.random_seed)
+        self.bert = BertModel.from_pretrained("bert-base-uncased")
 
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
