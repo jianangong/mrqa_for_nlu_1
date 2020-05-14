@@ -76,21 +76,27 @@ class BaseTrainer(object):
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
         loglikelihoods = []
-        for x in data_loader:
-        #for i in range(self.args.num_layers - 1):
-            x = self.args.hidden_size[i](x)
-            logits = self.args.hidden_size[-1](x)
+        for i, batch in enumerate(data_loader, start=1):
+            input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
+        
+            outputs = self.bert(
+                input_ids,
+                attention_mask=None,
+                token_type_ids=None,
+                position_ids=position_ids,
+                head_mask=None,
+                inputs_embeds=None,
+            )
+
+            sequence_output = outputs[0]
+            logits = self.qa_outputs(sequence_output)
             log_prob = F.log_softmax(logits, dim=1)
         
-            #x = x.view(batch_size, -1)
-            #x = Variable(x).cuda() if self._is_on_cuda() else Variable(x)
-            #y = Variable(y).cuda() if self._is_on_cuda() else Variable(y)
             loglikelihoods.append(log_prob)
                 
                 #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
             #)
-            if len(loglikelihoods) >= sample_size // batch_size:
-                break
+        
         # estimate the fisher information of the parameters.
         loglikelihoods = torch.cat(loglikelihoods).unbind()
         loglikelihood_grads = zip(*[autograd.grad(
