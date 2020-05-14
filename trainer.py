@@ -101,9 +101,10 @@ class BaseTrainer(object):
                 attention_mask=input_mask,
                 token_type_ids=seg_ids
             )
-            print("output loaded")
+            
             sequence_output = outputs[0]
             logits = self.qa_outputs(sequence_output)
+            logits = torch.stack(logits).to(device)
             log_prob = F.log_softmax(logits, dim=1)
         
             loglikelihoods.append(log_prob)
