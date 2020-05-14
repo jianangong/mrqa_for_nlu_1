@@ -25,7 +25,7 @@ from utils import eta, progress_bar
 
 from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
-from pytorch_pretrained_bert import BertModel
+from pytorch_pretrained_bert import BertModel, BertConfig
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -66,7 +66,8 @@ class BaseTrainer(object):
     def __init__(self, args):
         self.args = args
         self.set_random_seed(random_seed=args.random_seed)
-        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        #self.bert = BertModel.from_pretrained("bert-base-uncased")
+        self.bert = BertModel(BertConfig())
         
         self.qa_outputs = nn.Linear(self.args.hidden_size, 2)
         # init weight
@@ -79,6 +80,8 @@ class BaseTrainer(object):
             print("Debugging mode on.")
         self.features_lst = self.get_features(self.args.train_folder, self.args.debug)
         
+        
+        
      
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
@@ -87,15 +90,21 @@ class BaseTrainer(object):
             input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
             seq_len = torch.sum(torch.sign(input_ids), 1)
             max_len = torch.max(seq_len)
-
+            
+            if self.args.use_cuda:
+                input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
+                input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
+                seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
+                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+                        
             input_ids = input_ids[:, :max_len].clone()
             input_mask = input_mask[:, :max_len].clone()
             seg_ids = seg_ids[:, :max_len].clone()
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
 
-
-                
+   
             outputs = self.bert(
                 input_ids,
                 attention_mask=input_mask,
