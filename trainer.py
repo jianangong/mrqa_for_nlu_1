@@ -71,8 +71,8 @@ class BaseTrainer(object):
         
         self.qa_outputs = nn.Linear(self.args.hidden_size, 2).to('cuda')
         # init weight
-        self.qa_outputs.weight.data.normal_(mean=0.0, std=0.02).to('cuda')
-        self.qa_outputs.bias.data.zero_().to('cuda')
+        self.qa_outputs.weight.data.normal_(mean=0.0, std=0.02)
+
         
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
