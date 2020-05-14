@@ -106,7 +106,7 @@ class BaseTrainer(object):
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
 
-            outputs = model(input_ids)
+            outputs = self.model(input_ids)
             logits, _ = outputs[:2]
             
             #outputs = self.bert(
