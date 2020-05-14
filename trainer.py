@@ -25,6 +25,7 @@ from utils import eta, progress_bar
 
 from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
+import random
 
 
 def get_opt(param_optimizer, num_train_optimization_steps, args):
@@ -77,14 +78,14 @@ class BaseTrainer(object):
         loglikelihoods = []
         for x in data_loader:
         #for i in range(self.args.num_layers - 1):
-            x = self.self.args.hidden_size[i](x)
-            logits = self.args.hidden_size[-1](x)
-            log_prob = F.log_softmax(logits, dim=1)
+            #x = self.self.args.hidden_size[i](x)
+            #logits = self.args.hidden_size[-1](x)
+            #log_prob = F.log_softmax(logits, dim=1)
         
             #x = x.view(batch_size, -1)
             #x = Variable(x).cuda() if self._is_on_cuda() else Variable(x)
             #y = Variable(y).cuda() if self._is_on_cuda() else Variable(y)
-            loglikelihoods.append(log_prob)
+            loglikelihoods.append(random.randint(0,1))
                 
                 #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
             #)
