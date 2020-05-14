@@ -95,7 +95,7 @@ class BaseTrainer(object):
                 attention_mask=input_mask,
                 token_type_ids=seg_ids
             )
-
+            print("output loaded")
             sequence_output = outputs[0]
             logits = self.qa_outputs(sequence_output)
             log_prob = F.log_softmax(logits, dim=1)
