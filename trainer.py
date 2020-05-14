@@ -106,14 +106,12 @@ class BaseTrainer(object):
             end_positions = end_positions.clone()
             
             model = self.bert.to('cuda')
-            outputs = model(
+            
+            logits = self.qa_outputs(torch.stack(outputs = model(
                 input_ids,
                 attention_mask=input_mask,
                 token_type_ids=seg_ids
-            )
-            
-            sequence_output = torch.stack(outputs[0]).to('cuda')
-            logits = self.qa_outputs(sequence_output).to('cuda')
+            )[0]))
             log_prob = F.log_softmax(logits, dim=0).to('cuda')
            
             loglikelihoods.append(log_prob)
