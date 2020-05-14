@@ -78,7 +78,7 @@ class BaseTrainer(object):
         loglikelihoods = []
         for x in data_loader:
         #for i in range(self.args.num_layers - 1):
-            #x = self.self.args.hidden_size[i](x)
+            #x = self.args.hidden_size[i](x)
             #logits = self.args.hidden_size[-1](x)
             #log_prob = F.log_softmax(logits, dim=1)
         
