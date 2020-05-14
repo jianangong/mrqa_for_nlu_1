@@ -75,13 +75,19 @@ class BaseTrainer(object):
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
         loglikelihoods = []
-        for x, y in data_loader:
-            x = x.view(batch_size, -1)
-            x = Variable(x).cuda() if self._is_on_cuda() else Variable(x)
-            y = Variable(y).cuda() if self._is_on_cuda() else Variable(y)
-            loglikelihoods.append(
-                F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
-            )
+        #for x in data_loader:
+        for i in range(self.num_layers - 1):
+            x = self.hidden_layers[i](x)
+            logits = self.hidden_layers[-1](x)
+            log_prob = F.log_softmax(logits, dim=1)
+        
+            #x = x.view(batch_size, -1)
+            #x = Variable(x).cuda() if self._is_on_cuda() else Variable(x)
+            #y = Variable(y).cuda() if self._is_on_cuda() else Variable(y)
+            loglikelihoods.append(log_prob)
+                
+                #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
+            #)
             if len(loglikelihoods) >= sample_size // batch_size:
                 break
         # estimate the fisher information of the parameters.
@@ -235,7 +241,7 @@ class BaseTrainer(object):
         return features_lst
 
     
-    def get_data_probs(self, features_lst, args):
+    def get_data_loader(self, features_lst, args):
 
         
         all_input_ids = []
@@ -267,9 +273,7 @@ class BaseTrainer(object):
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids,
                                    all_start_positions, all_end_positions, all_labels )
         
-        train_sampler = DistributedSampler(train_data)
-        
-        logits = train_sampler.forward(train_data)
+
         
         if args.distributed:
             train_sampler = DistributedSampler(train_data)
