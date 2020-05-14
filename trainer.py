@@ -98,9 +98,7 @@ class BaseTrainer(object):
             outputs = self.bert(
                 input_ids,
                 attention_mask=input_mask,
-                token_type_ids=seg_ids,
-                head_mask=None,
-                inputs_embeds=None,
+                token_type_ids=seg_ids
             )
 
             sequence_output = outputs[0]
