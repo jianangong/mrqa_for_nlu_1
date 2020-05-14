@@ -68,7 +68,7 @@ class BaseTrainer(object):
         self.set_random_seed(random_seed=args.random_seed)
         self.bert = BertModel.from_pretrained("bert-base-uncased")
         
-        self.qa_outputs = nn.Linear(hidden_size, 2)
+        self.qa_outputs = nn.Linear(self.args.hidden_size, 2)
         # init weight
         self.qa_outputs.weight.data.normal_(mean=0.0, std=0.02)
         self.qa_outputs.bias.data.zero_()
