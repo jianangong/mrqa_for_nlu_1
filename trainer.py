@@ -26,7 +26,8 @@ from utils import eta, progress_bar
 from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
 from pytorch_pretrained_bert import BertModel
-
+import torch.nn as nn
+import torch.nn.functional as F
 
 def get_opt(param_optimizer, num_train_optimization_steps, args):
     """
