@@ -88,12 +88,7 @@ class BaseTrainer(object):
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
 
-            if self.args.use_cuda:
-                input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
-                input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
-                seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
-                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+
                 
             outputs = self.bert(
                 input_ids,
