@@ -66,7 +66,12 @@ class BaseTrainer(object):
         self.args = args
         self.set_random_seed(random_seed=args.random_seed)
         self.bert = BertModel.from_pretrained("bert-base-uncased")
-
+        
+        self.qa_outputs = nn.Linear(hidden_size, 2)
+        # init weight
+        self.qa_outputs.weight.data.normal_(mean=0.0, std=0.02)
+        self.qa_outputs.bias.data.zero_()
+        
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
         if args.debug:
