@@ -83,8 +83,8 @@ class BaseTrainer(object):
             outputs = self.bert(
                 input_ids,
                 attention_mask=input_mask,
-                token_type_ids=None,
-                position_ids=seg_ids,
+                token_type_ids=seg_ids,
+                position_ids=None,
                 head_mask=None,
                 inputs_embeds=None,
             )
