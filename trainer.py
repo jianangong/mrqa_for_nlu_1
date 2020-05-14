@@ -92,21 +92,21 @@ class BaseTrainer(object):
             max_len = torch.max(seq_len)
           
             
-            #if self.args.use_cuda:
-            #    input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
-            #    input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
-            #    seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
-            #    start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-            #    end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+            if self.args.use_cuda:
+                input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
+                input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
+                seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
+                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
                         
             input_ids = input_ids[:, :max_len].clone()
             input_mask = input_mask[:, :max_len].clone()
             seg_ids = seg_ids[:, :max_len].clone()
             start_positions = start_positions.clone()
             end_positions = end_positions.clone()
-
             
-            outputs = self.bert(
+            model = self.bert.to('cuda')
+            outputs = model(
                 input_ids,
                 attention_mask=input_mask,
                 token_type_ids=seg_ids
