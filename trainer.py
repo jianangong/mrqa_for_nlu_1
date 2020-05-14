@@ -117,7 +117,7 @@ class BaseTrainer(object):
             #
             #sequence_output = torch.stack(outputs[0])
             #logits = self.qa_outputs(sequence_output)
-            log_prob = F.log_softmax(loss, dim=1)
+            log_prob = F.log_softmax(loss, dim=0)
            
             loglikelihoods.append(log_prob)
                 
