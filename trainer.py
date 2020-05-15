@@ -114,7 +114,7 @@ class BaseTrainer(object):
                    token_type_ids=seg_ids
                 )[0]
                 x=torch.stack(x)
-                logits = self.qa_outputs(x)
+                logits = self.qa_outputs(x).to('cuda')
                 log_prob = F.log_softmax(logits, dim=0)
                 #log_prob = F.log_softmax(torch.rand(len(seq_len),1), dim=0)
                 loglikelihoods.append(log_prob)
