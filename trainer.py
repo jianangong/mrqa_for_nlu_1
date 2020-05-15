@@ -106,7 +106,8 @@ class BaseTrainer(object):
                 start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
                 end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
 
-                model = self.bert.to(device)
+                model = self.bert.to('cuda')
+                model = nn.DataParallel(model)
                 x=model(
                    input_ids,
                    attention_mask=input_mask,
