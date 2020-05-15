@@ -119,6 +119,7 @@ class BaseTrainer(object):
           
         # estimate the fisher information of the parameters.
         loglikelihoods = torch.cat(loglikelihoods).unbind()
+        loglikelihoods = Variable(likelihoods.data, requires_grad=True)
         loglikelihood_grads = zip(*[autograd.grad(
             l, self.model.parameters(),
             retain_graph=(i < len(loglikelihoods))
