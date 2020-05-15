@@ -79,7 +79,7 @@ class BaseTrainer(object):
         self.features_lst = self.get_features(self.args.train_folder, self.args.debug)
         
         
-        
+      
      
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
@@ -116,7 +116,7 @@ class BaseTrainer(object):
                 
                 #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
             #)
-        
+        likelihoods = Variable(likelihoods.data, requires_grad=True)  
         # estimate the fisher information of the parameters.
         loglikelihoods = torch.cat(loglikelihoods).unbind()
         loglikelihood_grads = zip(*[autograd.grad(
