@@ -70,7 +70,7 @@ class BaseTrainer(object):
         self.bert = BertModel.from_pretrained("bert-base-uncased")
         #self.bert = BertModel(BertConfig())
         
-        self.qa_outputs = nn.Linear(self.args.hidden_size, 2).to('cuda')
+        self.qa_outputs = nn.Linear(self.args.hidden_size, 2).to()
         # init weight
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
@@ -106,7 +106,7 @@ class BaseTrainer(object):
                 start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
                 end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
 
-                model = self.bert.to('cuda')
+                model = self.bert.to(device)
                 x=model(
                    input_ids,
                    attention_mask=input_mask,
