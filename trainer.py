@@ -107,16 +107,16 @@ class BaseTrainer(object):
             end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
             
             try:	
-            model = self.bert.to('cuda')	                
-            model = nn.DataParallel(model)	
-            x=model(
-                   input_ids,
-                   attention_mask=input_mask,
-                   token_type_ids=seg_ids
-                )[0]
-            x=torch.stack(x)
-            	                   
-            logits = self.qa_outputs(x)	                 
+                model = self.bert.to('cuda')	                
+                model = nn.DataParallel(model)	
+                x=model(
+                       input_ids,
+                       attention_mask=input_mask,
+                       token_type_ids=seg_ids
+                    )[0]
+                x=torch.stack(x)
+
+                logits = self.qa_outputs(x)	                 
             except RuntimeError as exception:	                
                 if "out of memory" in str(exception):	            
                     print("WARNING: out of memory")	              
