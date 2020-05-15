@@ -108,7 +108,7 @@ class BaseTrainer(object):
                input_ids,
                attention_mask=input_mask,
                token_type_ids=seg_ids
-            )[0])
+            )[0]
             x=torch.stack(x)
             logits = self.qa_outputs(x)
             log_prob = F.log_softmax(logits, dim=0)
