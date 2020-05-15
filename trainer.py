@@ -70,7 +70,7 @@ class BaseTrainer(object):
         self.bert = BertModel.from_pretrained("bert-base-uncased")
         #self.bert = BertModel(BertConfig())
         
-        self.qa_outputs = nn.Linear(self.args.hidden_size, 2).to()
+        self.qa_outputs = nn.Linear(self.args.hidden_size, 2).to('cuda')
         # init weight
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model,
                                                        do_lower_case=args.do_lower_case)
@@ -114,7 +114,7 @@ class BaseTrainer(object):
                    token_type_ids=seg_ids
                 )[0]
                 x=torch.stack(x)
-                logits = self.qa_outputs(x).to('cuda')
+                logits = self.qa_outputs(x)
                 log_prob = F.log_softmax(logits, dim=0)
                 #log_prob = F.log_softmax(torch.rand(len(seq_len),1), dim=0)
                 loglikelihoods.append(log_prob)
