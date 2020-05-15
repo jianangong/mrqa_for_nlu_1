@@ -83,40 +83,43 @@ class BaseTrainer(object):
      
     def estimate_fisher(self, data_loader, sample_size, batch_size=32):
         # sample loglikelihoods from the dataset.
+        
         loglikelihoods = []
-        for i, batch in enumerate(data_loader, start=1):
-            input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
-            seq_len = torch.sum(torch.sign(input_ids), 1).detach()
-            max_len = torch.max(seq_len).detach()
-          
-            
-           #if self.args.use_cuda:
-           #    input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
-           #    input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
-           #    seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
-           #    start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-           #    end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
-                     
-            input_ids = input_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            input_mask = input_mask[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            seg_ids = seg_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-            end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+        with torch.no_grad():
 
-            model = self.bert.to('cuda')
-            x=model(
-               input_ids,
-               attention_mask=input_mask,
-               token_type_ids=seg_ids
-            )[0]
-            x=torch.stack(x)
-            logits = self.qa_outputs(x)
-            log_prob = F.log_softmax(logits, dim=0)
-            #log_prob = F.log_softmax(torch.rand(len(seq_len),1), dim=0)
-            loglikelihoods.append(log_prob)
-            gc.collect()
-                #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
-            #)
+            for i, batch in enumerate(data_loader, start=1):
+                input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
+                seq_len = torch.sum(torch.sign(input_ids), 1).detach()
+                max_len = torch.max(seq_len).detach()
+
+
+               #if self.args.use_cuda:
+               #    input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
+               #    input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
+               #    seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
+               #    start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+               #    end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+
+                input_ids = input_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+                input_mask = input_mask[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+                seg_ids = seg_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+
+                model = self.bert.to('cuda')
+                x=model(
+                   input_ids,
+                   attention_mask=input_mask,
+                   token_type_ids=seg_ids
+                )[0]
+                x=torch.stack(x)
+                logits = self.qa_outputs(x)
+                log_prob = F.log_softmax(logits, dim=0)
+                #log_prob = F.log_softmax(torch.rand(len(seq_len),1), dim=0)
+                loglikelihoods.append(log_prob)
+                gc.collect()
+                    #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
+                #)
           
         # estimate the fisher information of the parameters.
         loglikelihoods = torch.cat(loglikelihoods).unbind()
