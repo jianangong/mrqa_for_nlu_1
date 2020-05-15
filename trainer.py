@@ -4,7 +4,7 @@ import pickle
 import random
 import time
 import warnings
-
+import gc
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
@@ -114,7 +114,7 @@ class BaseTrainer(object):
             log_prob = F.log_softmax(logits, dim=0)
             #log_prob = F.log_softmax(torch.rand(len(seq_len),1), dim=0)
             loglikelihoods.append(log_prob)
-                
+            gc.collect()
                 #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
             #)
           
