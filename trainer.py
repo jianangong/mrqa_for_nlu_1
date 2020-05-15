@@ -25,6 +25,7 @@ from utils import eta, progress_bar
 
 from torch.utils.data.dataloader import default_collate
 from torch.autograd import Variable
+from torch import autograd
 from pytorch_pretrained_bert import BertModel, BertConfig
 import torch.nn as nn
 import torch.nn.functional as F
