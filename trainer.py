@@ -89,28 +89,28 @@ class BaseTrainer(object):
             max_len = torch.max(seq_len)
           
             
-            #if self.args.use_cuda:
-            #    input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
-            #    input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
-            #    seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
-            #    start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-            #    end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
-                        
-            #input_ids = input_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            #input_mask = input_mask[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            #seg_ids = seg_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
-            #start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
-            #end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
-            #
-            #model = self.bert.to('cuda')
-            #
-            #logits = self.qa_outputs(torch.stack(model(
-            #    input_ids,
-            #    attention_mask=input_mask,
-            #    token_type_ids=seg_ids
-            #)[0]))
-            #log_prob = F.log_softmax(logits, dim=0)
-            log_prob = F.log_softmax(torch.rand(seq_len), dim=0)
+            if self.args.use_cuda:
+                input_ids = input_ids.cuda(self.args.gpu, non_blocking=True)
+                input_mask = input_mask.cuda(self.args.gpu, non_blocking=True)
+                seg_ids = seg_ids.cuda(self.args.gpu, non_blocking=True)
+                start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+                end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+                       
+            input_ids = input_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+            input_mask = input_mask[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+            seg_ids = seg_ids[:, :max_len].cuda(self.args.gpu, non_blocking=True)
+            start_positions = start_positions.cuda(self.args.gpu, non_blocking=True)
+            end_positions = end_positions.cuda(self.args.gpu, non_blocking=True)
+            
+            model = self.bert.to('cuda')
+            
+            logits = self.qa_outputs(torch.stack(model(
+                input_ids,
+                attention_mask=input_mask,
+                token_type_ids=seg_ids
+            )[0]))
+            log_prob = F.log_softmax(logits, dim=0)
+            #log_prob = F.log_softmax(torch.rand(seq_len), dim=0)
             loglikelihoods.append(log_prob)
                 
                 #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
