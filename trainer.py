@@ -85,8 +85,8 @@ class BaseTrainer(object):
         # sample loglikelihoods from the dataset.
         
         loglikelihoods = []
-        with torch.no_grad():
 
+        
             for i, batch in enumerate(data_loader, start=1):
                 input_ids, input_mask, seg_ids, start_positions, end_positions, _ = batch
                 seq_len = torch.sum(torch.sign(input_ids), 1).detach()
@@ -121,11 +121,11 @@ class BaseTrainer(object):
                 gc.collect()
                     #F.log_softmax(self(x), dim=1)[range(batch_size), y.data]
                 #)
-          
+        print(loglikelihoods)
         # estimate the fisher information of the parameters.
 #         loglikelihoods = torch.cat(loglikelihoods).unbind()
 #         loglikelihoods = torch.stack(loglikelihoods,requires_grad=True).to('cuda')
-        loglikelihoods = torch.stack(loglikelihoods)
+        loglikelihoods = torch.tensor(loglikelihoods)
         loglikelihoods = Variable(loglikelihoods, requires_grad=True)
         loglikelihood_grads = zip(*[autograd.grad(
             l, self.model.parameters(),
